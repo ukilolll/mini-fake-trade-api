@@ -19,9 +19,11 @@ import (
 var(
 	dbCon =db.Connect()
 	Dashboard = make(map[assetSymbol]*assetData)//map use struct must be pointer
+	responseStrcuture  []responseAssetData
 	upgrader = &ws.Upgrader{
 		CheckOrigin: func(r *http.Request) bool {return true},
 	}
+
 )
 
 func showDashboad(name assetSymbol){
@@ -64,34 +66,42 @@ func RunDashboard(){
 			log.Panicln(err)
 		}
 	}
-    //ticker := time.NewTicker(time.Second * 2)
+
 	for{
-		// select{	
-		// case _ = <- ticker.C:
-			err := conn.ReadJSON(&res)
-			if err != nil {
-				break
-			}	
+		err := conn.ReadJSON(&res)
+		if err != nil {
+			break
+		}	
 
-			if res.Type == "trade" {
+		if res.Type == "trade" {
 
-			for symbol,_ := range Dashboard{
-			for _,resData := range res.Data{
-				if string(symbol) == resData.AssetSymbol{
-						Dashboard[symbol].responseData = resData
-						//ShowDashboad(symbol)
-					}
-			// log.Println(
-			// "asset_id", assetData.Id,"\n",
-			// "asset_name", assetData.AsssetName,"\n",
-			// "asset_symbol", symbol,"\n",
-			// "price", assetData.Price,"\n",)
-				}
+
+		for symbol,_ := range Dashboard{
+		for _,resData := range res.Data{
+			if string(symbol) == resData.AssetSymbol{
+				Dashboard[symbol].responseData = resData
+				//ShowDashboad(symbol)
 			}
-
-			}
+		// "asset_id", assetData.Id,"\n",
+		// "asset_name", assetData.AsssetName,"\n",
+		// "asset_symbol", symbol,"\n",
+		// "price", assetData.Price,"\n",)
 		}
-	// }
+		}
+		var temp []responseAssetData
+		for assetSymbol,assetdata := range Dashboard{
+			temp = append(temp, responseAssetData{
+				Id: assetdata.Id,
+				AsssetName: assetdata.AsssetName,
+				Price: assetdata.Price,
+				Symbol: assetSymbol,
+			})
+		}
+		responseStrcuture = temp
+
+	}
+	}
+
 }
 
 func Test(){
@@ -110,6 +120,25 @@ func GetAssetDataThatHandle(ctx *gin.Context){
 	}
 
 	ctx.JSON(200,data)
+}
+
+func GetAssetDataRealTime(ctx *gin.Context){
+	conn,err := upgrader.Upgrade(ctx.Writer,ctx.Request,nil)	
+	if notOk := pkg.Internal.IsErr(err,"internal server error",ctx); notOk  {
+		return
+	}
+	defer conn.Close()
+
+	ticker := time.NewTicker(2 * time.Second)
+
+	for{
+	select{
+	case _ = <-ticker.C:
+		conn.WriteJSON(responseStrcuture)
+
+	}
+	}
+
 }
 
 func CheckAsset(ctx *gin.Context){

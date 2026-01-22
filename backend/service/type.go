@@ -41,3 +41,10 @@ type assetResponse struct{
 	Data []assetResponseData `json:"data"`
 	Type string  `json:"type"`
 }
+
+type responseAssetData struct{
+	Id int `json:"asset_id"`
+	AsssetName string `json:"asset_name"`
+	Symbol assetSymbol `json:"asset_symbol"`
+	Price float64`json:"price"`
+}

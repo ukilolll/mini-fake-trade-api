@@ -27,16 +27,50 @@ export default function Trading() {
   const fetchAssets = async () => {
     setLoadingAssets(true);
     try {
-      const response = await axios.get('http://localhost:3002/service', {
-        withCredentials: true
-      });
-      if (response.data && Array.isArray(response.data)) {
-        setAssets(response.data);
-      }
+      const ws = new WebSocket('ws://localhost:3002/serviceRealTime');
+      
+      ws.onopen = () => {
+        console.log('WebSocket connected');
+      };
+
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (Array.isArray(data)) {
+          setAssets(prevAssets => {
+            // If assets are not initialized, set them
+            if (prevAssets.length === 0) {
+              setLoadingAssets(false);
+              return data;
+            }
+            
+            // Otherwise, just update prices
+            return prevAssets.map(asset => {
+              const updatedAsset = data.find(a => a.asset_symbol === asset.asset_symbol);
+              return updatedAsset ? { ...asset, price: updatedAsset.price } : asset;
+            });
+          });
+        }
+      };
+
+      ws.onerror = (err) => {
+        setError('Failed to load assets');
+        console.error('WebSocket error:', err);
+        setLoadingAssets(false);
+      };
+
+      ws.onclose = () => {
+        console.log('WebSocket closed');
+      };
+
+
+      return () => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.close();
+        }
+      };
     } catch (err) {
       setError('Failed to load assets');
       console.error('Error fetching assets:', err);
-    } finally {
       setLoadingAssets(false);
     }
   };

@@ -39,6 +39,7 @@ func runServer(){
 	}))
 
 	r.GET("/service",service.GetAssetDataThatHandle)
+	r.GET("/serviceRealTime",service.GetAssetDataRealTime)
 
 	authR := r.Group("/auth")
 	authR.GET("/google/login",auth.HandleGoogleLogin)

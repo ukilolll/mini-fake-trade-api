@@ -1,7 +1,13 @@
 package test
 
-import "github/ukilolll/trade/service"
+import "fmt"
 
 func Test0() {
-	service.RunDashboard()
+	var main []int
+	temp := []int{1, 2, 4, 6, 3, 324, 343, 43}
+	main = temp
+	main = temp
+	main = temp
+	main = temp
+	fmt.Println(main)
 }

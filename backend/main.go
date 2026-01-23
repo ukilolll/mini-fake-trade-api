@@ -43,6 +43,7 @@ func runServer(){
 
 	authR := r.Group("/auth")
 	authR.GET("/google/login",auth.HandleGoogleLogin)
+	authR.POST("/annoymous/login",auth.AnnoymousLogin)
 	authR.GET("/google/callback",auth.HandleGoogleCallback)
 	authR.POST("/logout",auth.HandleLogout)
 	authR.GET("/user/profile",auth.AuthMiddleware,auth.CheckAuth)

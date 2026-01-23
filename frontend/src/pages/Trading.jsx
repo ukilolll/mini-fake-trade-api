@@ -6,7 +6,7 @@ import '../styles/Trading.css';
 
 export default function Trading() {
   const navigate = useNavigate();
-  const { user, loading } = useContext(AuthContext);
+  const { user, loading , logout } = useContext(AuthContext);
   const [assets, setAssets] = useState([]);
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [usdAmount, setUsdAmount] = useState('');
@@ -140,20 +140,22 @@ export default function Trading() {
               <span>Welcome, {user?.username}</span>
               <span>Your Coin ${user?.coin.toFixed(6)}</span>
               <button 
-                className="logout-btn"
-                onClick={() => {
-                  localStorage.removeItem('auth_token');
-                  navigate('/login');
-                }}
-              >
-                Logout
-              </button>
-              <button 
                 className="portfolio-btn"
                 onClick={() => navigate('/portfolio')}
               >
                 My Portfolio
               </button>
+
+              <button 
+                className="logout-btn"
+                onClick={() => {
+                  logout()
+                  navigate('/login');
+                }}
+              >
+                Logout
+              </button>
+
             </>
           ) : (
             <button 
@@ -206,7 +208,7 @@ export default function Trading() {
                 id="usdAmount"
                 type="number"
                 min="1"
-                step="0.01"
+                step="1"
                 value={usdAmount}
                 onChange={(e) => setUsdAmount(e.target.value)}
                 className="form-control"

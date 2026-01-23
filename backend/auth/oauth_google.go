@@ -43,7 +43,7 @@ var (
 	JWT_SECRET = []byte(os.Getenv("JWT_SECRET"))
 	authCookie = &Cookie{
 		name: "trade_auth_token",
-		time: 7 * 24 * time.Hour,
+		time: 14 * 24 * time.Hour,
 	}
 
 	dbCon = db.Connect()
@@ -204,6 +204,8 @@ func CheckAuth(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{"username": username, "coin": coin})
 }
+
+
 
 func HandleLogout(ctx *gin.Context) {
 	ctx.SetCookie(authCookie.name, "", -1, "/", "localhost", false, true)

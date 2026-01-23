@@ -434,7 +434,7 @@ func Reset(ctx *gin.Context){
 		return
 	}
 
-	_, err = trans.Exec("DELETE FROM user_assets WHERE user_id = $1")
+	_, err = trans.Exec("DELETE FROM user_assets WHERE user_id = $1" , user_id)
 	if notOk := pkg.Internal.IsErr(err,"internal server error",ctx); notOk  {
 		return
 	}

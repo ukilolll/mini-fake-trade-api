@@ -200,6 +200,19 @@ export default function Portfolio() {
     }, 0);
   };
 
+  const handleResetTreading  = async() => {
+    try{
+      await axios.delete(
+        'http://localhost:3002/trade/reset',
+        {
+          withCredentials: true
+        }
+      );
+    }catch(err){
+      console.error(err)
+    }
+  }
+
   if (loading) {
     return <div className="loading">Loading...</div>;
   }
@@ -211,18 +224,18 @@ export default function Portfolio() {
         <div className="user-actions">
           <button 
             className="trading-btn"
-            onClick={() => navigate('/trading')}
+            onClick={() => navigate('/')}
           >
             Back to Trading
           </button>
           <button 
             className="logout-btn"
-            onClick={() => {
-              localStorage.removeItem('auth_token');
-              navigate('/login');
+            onClick={async () => {
+              await handleResetTreading()
+              navigate('/')
             }}
           >
-            Logout
+            reset
           </button>
         </div>
       </div>
@@ -248,7 +261,7 @@ export default function Portfolio() {
         {portfolio.length === 0 && !loadingPortfolio && (
           <div className="empty-state">
             <p>You don't own any stocks yet.</p>
-            <button className="trading-btn" onClick={() => navigate('/trading')}>
+            <button className="trading-btn" onClick={() => navigate('/')}>
               Start Trading
             </button>
           </div>

@@ -2,14 +2,15 @@ import React, { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import '../styles/Login.css';
+import axios from 'axios';
 
 export default function Login() {
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
+  const { user , loadUser } = useContext(AuthContext);
 
   useEffect(() => {
     if (user) {
-      navigate('/trading');
+      navigate('/');
     }
   }, [user, navigate]);
 
@@ -17,12 +18,31 @@ export default function Login() {
     window.location.href = 'http://localhost:3002/auth/google/login';
   };
 
+  const handleAnonymous  = async(e) => {
+  e.preventDefault();   
+    try{
+      await axios.post(
+       'http://localhost:3002/auth/annoymous/login',
+      {}, 
+        {
+          withCredentials: true
+        }
+      );
+      
+    loadUser()
+    navigate('/');
+
+    }catch(err){
+      console.error(err)
+    }
+  }
+
   return (
     <div className="login-container">
       <div className="login-box">
         <div className="login-header">
           <h1>Paper Trading</h1>
-          <p>Practice trading with virtual money</p>
+          <p>caution Anonymous Sign in only used for 2 weeks</p>
         </div>
 
         <div className="login-content">
@@ -32,19 +52,13 @@ export default function Login() {
             </svg>
             Sign in with Google
           </button>
+          
+          <button className="google-login-btn" onClick={handleAnonymous}>
+            Anonymous Sign in 
+          </button>
 
-          <div className="divider">
-            <span>or</span>
-          </div>
-
-          <p className="info-text">
-            No account needed. Just sign in with your Google account to get started.
-          </p>
         </div>
 
-        <div className="login-footer">
-          <p>Your transactions are simulated. No real money involved.</p>
-        </div>
       </div>
     </div>
   );

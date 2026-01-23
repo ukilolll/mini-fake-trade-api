@@ -10,8 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Check if user is logged in using /auth/check endpoint
+      // Check if user is logged in using /auth/check endpoint
     const checkAuth = async () => {
       try {
         // Call /auth/check endpoint - cookie will be sent automatically
@@ -46,16 +45,35 @@ export const AuthProvider = ({ children }) => {
       }
     };
 
+  useEffect(() => {
+
+
     checkAuth();
   }, []);
 
-  const logout = () => {
-    // Cookie will be cleared by backend
+  const logout = async() => {
+    try {
+    await axios.post(
+      'http://localhost:3002/auth/logout',
+      {},
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
     setUser(null);
+    }catch(err){
+      console.error(err)
+    }
   };
 
+  const loadUser = async() => {
+    checkAuth()
+  }
+
   return (
-    <AuthContext.Provider value={{ user, setUser, loading, logout }}>
+    <AuthContext.Provider value={{ user, setUser, loading, logout ,loadUser }}>
       {children}
     </AuthContext.Provider>
   );
